@@ -8,8 +8,6 @@ import sys
 import os
 import docx
 import sqlite3
-import subprocess
-
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget, \
     QFrame, QLabel, QPushButton, QCheckBox, QAction, QFileDialog, QTableView, \
@@ -18,11 +16,11 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QDesktopWidget, \
 
 from PyQt5.QtGui import QFont, QStandardItemModel, QStandardItem, QPalette, QColor
 
-from PyQt5.QtCore import Qt
 #Key Global Variables
 
 Experiments = {}
 
+#Calendar for Date Selection
 class Cal(QMainWindow):
     def __init__(self, parent=None):
         super(Cal, self).__init__(parent)
@@ -37,7 +35,7 @@ class Cal(QMainWindow):
 
         self.Cale.clicked()
 
-
+#Main Window
 class Atlas(QMainWindow):
 
     def __init__(self):
@@ -46,6 +44,28 @@ class Atlas(QMainWindow):
         self.initUI()
 
     def initUI(self):
+
+        #On startup, check whether variable databases exist. If not, build databases.
+
+        #Check Variable Database
+        if os.path.exists("./Variables/Variables.sqlite3") == False:
+            #Create Variables Database
+            conn = sqlite3.connect("./Variables/Variables.sqlite3")
+            c = conn.cursor()
+
+            #Create Antibiotics Table
+            c.execute("CREATE TABLE Antibiotics(id INTEGER PRIMARY KEY, name TEXT)")
+            ant="Carbenicillin"
+            c.execute("INSERT INTO Antibiotics(name) VALUES (?)",(ant,))
+            ant="Kanamycin"
+            c.execute("INSERT INTO Antibiotics(name) VALUES (?)",(ant,))
+            ant="Chloramphenicol"
+            c.execute("INSERT INTO Antibiotics(name) VALUES (?)",(ant,))
+
+            conn.commit()
+            conn.close()
+
+        #Insert Menu Bar
         self.openFile = QAction('&Open', self)
         self.openFile.setShortcut('Ctrl+O')
         self.openFile.setStatusTip('Open new File')
@@ -55,21 +75,19 @@ class Atlas(QMainWindow):
         self.fileMenu = menubar.addMenu('&File')
         self.fileMenu.addAction(self.openFile)
 
+        #Center Window
         self.resize(1200, 600)
-
-        # Center Window
         qtRectangle = self.frameGeometry()
         centerPoint = QDesktopWidget().availableGeometry().center()
         qtRectangle.moveCenter(centerPoint)
         self.move(qtRectangle.topLeft())
-
         self.setWindowTitle('ATLAS')
 
-        # StatusBar
+        #Insert Status Bar
         self.statusBar().showMessage('Ready')
         self.show()
 
-        # Initialise Experiment Selection Frame
+        #Experiment Selection Frame
         self.ExpFrame = QFrame(self)
         print(self.ExpFrame.parentWidget())
         self.ExpFrame.move(5, 25)
@@ -77,8 +95,7 @@ class Atlas(QMainWindow):
         self.ExpFrame.setFrameShape(QFrame.StyledPanel)
         self.ExpFrame.show()
 
-        # Experiment Frame Label
-
+        #Experiment Frame Label
         self.ExpLabel = QLabel(self.ExpFrame)
         self.ExpLabel.setText("Experiment Tables")
         self.ExpLabel.move(5, 1)
@@ -86,8 +103,7 @@ class Atlas(QMainWindow):
         self.ExpLabel.setFont(newfont)
         self.ExpLabel.show()
 
-        # Experiment Table Generation Button
-
+        #Experiment Table Generation Button
         self.ExpButton = QPushButton(self.ExpFrame)
         self.ExpButton.resize(120, 30)
         self.ExpButton.move(320, 20)
@@ -95,13 +111,13 @@ class Atlas(QMainWindow):
         self.ExpButton.clicked.connect(self.GenExpList)
         self.ExpButton.show()
 
-        # Experiment Check Buttons
-
+        #Experiment Check Buttons
         self.ExpCheck1 = QCheckBox(self.ExpFrame)
         self.ExpCheck1.move(15, 30)
         self.ExpCheck1.setText("Include Complete Experiments")
         self.ExpCheck1.show()
 
+        #Experiment Table
         self.ExpTable = QTableView(self.ExpFrame)
         self.ExpTable.move(10, 60)
         self.ExpTable.resize(430, 130)
@@ -120,15 +136,16 @@ class Atlas(QMainWindow):
         self.ExpTable.setColumnWidth(0,12)
         self.ExpTable.resizeRowsToContents()
         self.ExpTable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        # self.ExpTable.clicked.connect(self.openExp)
         self.ExpTable.show()
 
+        #Modification Frame
         self.ModFrame = QFrame(self)
         self.ModFrame.move(5, 230)
         self.ModFrame.resize(450, 350)
         self.ModFrame.setFrameShape(QFrame.StyledPanel)
         self.ModFrame.show()
 
+        #Modification Label
         self.ModLabel = QLabel(self.ModFrame)
         self.ModLabel.setText("Section Viewer")
         self.ModLabel.move(5, 1)
@@ -136,6 +153,7 @@ class Atlas(QMainWindow):
         self.ModLabel.setFont(newfont)
         self.ModLabel.show()
 
+        #Modification Table
         self.ModTable = QTableView(self.ModFrame)
         self.ModTable.move(10, 20)
         self.ModTable.resize(430, 320)
@@ -157,20 +175,7 @@ class Atlas(QMainWindow):
         self.ModTable.clicked.connect(self.openExp)
         self.ModTable.show()
 
-
-        # self.DetFrame = QFrame(self)
-        # self.DetFrame.move(460, 25)
-        # self.DetFrame.resize(735, 555)
-        # self.DetFrame.setFrameShape(QFrame.StyledPanel)
-        # self.DetFrame.show()
-        #
-        # self.DetLabel = QLabel(self.DetFrame)
-        # self.DetLabel.setText("Detailed View")
-        # self.DetLabel.move(5, 1)
-        # newfont = QFont("Times", 8, QFont.Bold)
-        # self.DetLabel.setFont(newfont)
-        # self.DetLabel.show()
-
+        #Detailed Tabs
         self.DetTabs = QTabWidget(self)
         self.DetTab1 = QWidget(self)
         self.DetTab1.setAutoFillBackground(True)
@@ -182,14 +187,12 @@ class Atlas(QMainWindow):
         self.DetTabs.resize(735, 556)
         self.DetTabs.addTab(self.DetTab1,"DetTab1")
         self.DetTabs.addTab(self.DetTab2,"DetTab2")
-        self.DetTabs.addTab(self.DetTab3, "New Template")
+        self.DetTabs.addTab(self.DetTab3, "New Protocol")
         self.DetTabs.show()
 
         self.DetTabs.currentChanged.connect(self.TabChange)
 
-        #Load variable list when tab is activated
-        # self.DetTab3.actionEvent()
-
+        #New Protocol Tab Setup
         self.DTNew_Lab_Title = QLabel(self.DetTab3)
         self.DTNew_Lab_Title.setText("Title")
         self.DTNew_Lab_Title.move(5, 2)
@@ -198,7 +201,7 @@ class Atlas(QMainWindow):
         self.DTNew_Lab_Title.show()
 
         self.DTNew_Text_Title = QLineEdit(self.DetTab3)
-        self.DTNew_Text_Title.setText("Template Title")
+        self.DTNew_Text_Title.setText("Protocol Title")
         self.DTNew_Text_Title.move(3,23)
         self.DTNew_Text_Title.resize(723,17)
         self.DTNew_Text_Title.show()
@@ -237,45 +240,26 @@ class Atlas(QMainWindow):
         self.DTNew_Lab_Var.show()
 
         self.DTNew_Text_Section = QComboBox(self.DetTab3)
-        # self.DTNew_Text_Section.appendPlainText("Section Text")
         self.DTNew_Text_Section.move(3,346)
         self.DTNew_Text_Section.show()
 
-        #Check Variable Database
-        if os.path.exists("./Variables/Variables.sqlite3") == False:
-            #Create Variables Database
-            conn = sqlite3.connect("./Variables/Variables.sqlite3")
-            c = conn.cursor()
-
-            #Create Antibiotics Table
-            c.execute("CREATE TABLE Antibiotics(id INTEGER PRIMARY KEY, name TEXT)")
-            #Add Standard Antibiotics
-            #ant="Carbenicillin"
-            #c.execute("INSERT INTO Antibiotics(name) VALUES (?)",(ant,))
-            ant=["Carbenicillin"]
-            c.execute("INSERT INTO Antibiotics(name) VALUES (?)",(ant,))
-            c.execute("SELECT * FROM Antibiotics")
-            print(c.fetchall())
-
-            conn.commit()
-            conn.close()
-
-
-
+    #Test function for tab change detection - temporary function
     def TabChange(self, i):
         if i == 2:
             print("yes")
 
-
+    #Open file when experiment is clicked in list - temporary function
     def openExp(self,clickedIndex):
         Exp = clickedIndex.sibling(clickedIndex.row(),0).data()
         print(Exp)
         os.startfile(Experiments[Exp])
 
+    #Test function for opening file dialog box - temporary function
     def showDialog(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', '.')
         print(fname[0])
 
+    #Search Experiments folder and build list of Experiments present on computer
     def GenExpList(self):
         self.ExpTableModel.setRowCount(0)
         for root, dirs, files in os.walk(".\Experiments"):
@@ -304,21 +288,10 @@ class Atlas(QMainWindow):
         print(doc.paragraphs[1].text)
         print(Experiments)
 
+    #Open calendar function
     def OpenCal(self):
         print("hello")
         self.DTNew_Cal.show()
-
-
-# class DatePicker(QCalendarWidget):
-#     def __init__(self, parent=None):
-
-
-        # if fname[0]:
-        #     f = open(fname[0], 'r')
-        #
-        #     with f:
-        #         data = f.read()
-        #         self.textEdit.setText(data)
 
 # Is this file being run directly?
 if __name__ == '__main__':
