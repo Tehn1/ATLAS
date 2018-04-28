@@ -89,7 +89,6 @@ class Atlas(QMainWindow):
 
         #Experiment Selection Frame
         self.ExpFrame = QFrame(self)
-        print(self.ExpFrame.parentWidget())
         self.ExpFrame.move(5, 25)
         self.ExpFrame.resize(450, 200)
         self.ExpFrame.setFrameShape(QFrame.StyledPanel)
@@ -193,54 +192,74 @@ class Atlas(QMainWindow):
         self.DetTabs.currentChanged.connect(self.TabChange)
 
         #New Protocol Tab Setup
+        self.DTNew_Cat_Title = QLabel(self.DetTab3)
+        self.DTNew_Cat_Title.setText("Protocol Location")
+        self.DTNew_Cat_Title.move(5, 2)
+        newfont = QFont("Times", 8, QFont.Bold)
+        self.DTNew_Cat_Title.setFont(newfont)
+        self.DTNew_Cat_Title.show()
+
+        self.DTNew_CatText_Title = QLineEdit(self.DetTab3)
+        self.DTNew_CatText_Title.setText("./Protocols/General/")
+        self.DTNew_CatText_Title.move(3,22)
+        self.DTNew_CatText_Title.resize(723,17)
+        self.DTNew_CatText_Title.show()
+
+        self.CatButton = QPushButton(self.DetTab3)
+        self.CatButton.resize(120, 22)
+        self.CatButton.move(2, 40)
+        self.CatButton.setText("Change Location...")
+        #self.CatButton.clicked.connect(self.showDialogDir())
+        self.CatButton.show()
+
         self.DTNew_Lab_Title = QLabel(self.DetTab3)
         self.DTNew_Lab_Title.setText("Title")
-        self.DTNew_Lab_Title.move(5, 2)
+        self.DTNew_Lab_Title.move(5, 65)
         newfont = QFont("Times", 8, QFont.Bold)
         self.DTNew_Lab_Title.setFont(newfont)
         self.DTNew_Lab_Title.show()
 
         self.DTNew_Text_Title = QLineEdit(self.DetTab3)
         self.DTNew_Text_Title.setText("Protocol Title")
-        self.DTNew_Text_Title.move(3,23)
+        self.DTNew_Text_Title.move(3,83)
         self.DTNew_Text_Title.resize(723,17)
         self.DTNew_Text_Title.show()
 
         self.DTNew_Lab_Date = QLabel(self.DetTab3)
         self.DTNew_Lab_Date.setText("Date")
-        self.DTNew_Lab_Date.move(5, 47)
+        self.DTNew_Lab_Date.move(5, 107)
         newfont = QFont("Times", 8, QFont.Bold)
         self.DTNew_Lab_Date.setFont(newfont)
         self.DTNew_Lab_Date.show()
 
         self.DTNew_But_Date = QDateEdit(self.DetTab3)
-        self.DTNew_But_Date.move(3,68)
+        self.DTNew_But_Date.move(3,128)
         self.DTNew_But_Date.resize(80,19)
         self.DTNew_But_Date.setCalendarPopup(True)
         self.DTNew_But_Date.show()
 
         self.DTNew_Lab_Section = QLabel(self.DetTab3)
         self.DTNew_Lab_Section.setText("Section Text")
-        self.DTNew_Lab_Section.move(5, 94)
+        self.DTNew_Lab_Section.move(5, 154)
         newfont = QFont("Times", 8, QFont.Bold)
         self.DTNew_Lab_Section.setFont(newfont)
         self.DTNew_Lab_Section.show()
 
         self.DTNew_Text_Section = QPlainTextEdit(self.DetTab3)
         self.DTNew_Text_Section.appendPlainText("Section Text")
-        self.DTNew_Text_Section.move(3,116)
+        self.DTNew_Text_Section.move(3,176)
         self.DTNew_Text_Section.resize(723,200)
         self.DTNew_Text_Section.show()
 
         self.DTNew_Lab_Var = QLabel(self.DetTab3)
         self.DTNew_Lab_Var.setText("Insert Variable")
-        self.DTNew_Lab_Var.move(5, 326)
+        self.DTNew_Lab_Var.move(5, 386)
         newfont = QFont("Times", 8, QFont.Bold)
         self.DTNew_Lab_Var.setFont(newfont)
         self.DTNew_Lab_Var.show()
 
         self.DTNew_Text_Section = QComboBox(self.DetTab3)
-        self.DTNew_Text_Section.move(3,346)
+        self.DTNew_Text_Section.move(3,406)
         self.DTNew_Text_Section.show()
 
     #Test function for tab change detection - temporary function
@@ -258,6 +277,11 @@ class Atlas(QMainWindow):
     def showDialog(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', '.')
         print(fname[0])
+
+    #Open dialog box and select a folder
+    def showDialogDir(self):
+        fname = str(QFileDialog.getExistingDirectory(self, 'Select Directory'))
+        print(fname)
 
     #Search Experiments folder and build list of Experiments present on computer
     def GenExpList(self):
