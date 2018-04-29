@@ -62,6 +62,12 @@ class Atlas(QMainWindow):
             ant="Chloramphenicol"
             c.execute("INSERT INTO Antibiotics(name) VALUES (?)",(ant,))
 
+            # Create Plasmids Table
+            c.execute("CREATE TABLE Plasmids(id INTEGER PRIMARY KEY, name TEXT)")
+
+            # Create Primers Table
+            c.execute("CREATE TABLE Primers(id INTEGER PRIMARY KEY, name TEXT)")
+
             conn.commit()
             conn.close()
 
@@ -209,7 +215,8 @@ class Atlas(QMainWindow):
         self.CatButton.resize(120, 22)
         self.CatButton.move(2, 40)
         self.CatButton.setText("Change Location...")
-        #self.CatButton.clicked.connect(self.showDialogDir())
+        self.CatButton.clicked.connect(self.showDialogDir)
+
         self.CatButton.show()
 
         self.DTNew_Lab_Title = QLabel(self.DetTab3)
@@ -225,47 +232,109 @@ class Atlas(QMainWindow):
         self.DTNew_Text_Title.resize(723,17)
         self.DTNew_Text_Title.show()
 
-        self.DTNew_Lab_Date = QLabel(self.DetTab3)
-        self.DTNew_Lab_Date.setText("Date")
-        self.DTNew_Lab_Date.move(5, 107)
+        self.DTNew_Lab_Title = QLabel(self.DetTab3)
+        self.DTNew_Lab_Title.setText("Select Section")
+        self.DTNew_Lab_Title.move(5, 105)
         newfont = QFont("Times", 8, QFont.Bold)
-        self.DTNew_Lab_Date.setFont(newfont)
-        self.DTNew_Lab_Date.show()
+        self.DTNew_Lab_Title.setFont(newfont)
+        self.DTNew_Lab_Title.show()
 
-        self.DTNew_But_Date = QDateEdit(self.DetTab3)
-        self.DTNew_But_Date.move(3,128)
-        self.DTNew_But_Date.resize(80,19)
-        self.DTNew_But_Date.setCalendarPopup(True)
-        self.DTNew_But_Date.show()
+        self.DTNew_Text_Title = QComboBox(self.DetTab3)
+        self.DTNew_Text_Title.move(3,123)
+        self.DTNew_Text_Title.resize(723,17)
+        self.DTNew_Text_Title.show()
+
+
+        self.DTNew_Sec_Name = QLabel(self.DetTab3)
+        self.DTNew_Sec_Name.setText("Section Name")
+        self.DTNew_Sec_Name.move(5, 147)
+        newfont = QFont("Times", 8, QFont.Bold)
+        self.DTNew_Sec_Name.setFont(newfont)
+        self.DTNew_Sec_Name.show()
+
+        self.DTNew_Sec_Text = QLineEdit(self.DetTab3)
+        self.DTNew_Sec_Text.setText("Section Name")
+        self.DTNew_Sec_Text.move(3,168)
+        self.DTNew_Sec_Text.resize(723,17)
+        self.DTNew_Sec_Text.show()
+
+        # self.DTNew_Lab_Date = QLabel(self.DetTab3)
+        # self.DTNew_Lab_Date.setText("Date")
+        # self.DTNew_Lab_Date.move(5, 107)
+        # newfont = QFont("Times", 8, QFont.Bold)
+        # self.DTNew_Lab_Date.setFont(newfont)
+        # self.DTNew_Lab_Date.show()
+        #
+        # self.DTNew_But_Date = QDateEdit(self.DetTab3)
+        # self.DTNew_But_Date.move(3,128)
+        # self.DTNew_But_Date.resize(80,19)
+        # self.DTNew_But_Date.setCalendarPopup(True)
+        # self.DTNew_But_Date.show()
 
         self.DTNew_Lab_Section = QLabel(self.DetTab3)
         self.DTNew_Lab_Section.setText("Section Text")
-        self.DTNew_Lab_Section.move(5, 154)
+        self.DTNew_Lab_Section.move(5, 194)
         newfont = QFont("Times", 8, QFont.Bold)
         self.DTNew_Lab_Section.setFont(newfont)
         self.DTNew_Lab_Section.show()
 
         self.DTNew_Text_Section = QPlainTextEdit(self.DetTab3)
         self.DTNew_Text_Section.appendPlainText("Section Text")
-        self.DTNew_Text_Section.move(3,176)
+        self.DTNew_Text_Section.move(3,216)
         self.DTNew_Text_Section.resize(723,200)
         self.DTNew_Text_Section.show()
 
-        self.DTNew_Lab_Var = QLabel(self.DetTab3)
-        self.DTNew_Lab_Var.setText("Insert Variable")
-        self.DTNew_Lab_Var.move(5, 386)
+        self.DTNew_Var_Lab = QLabel(self.DetTab3)
+        self.DTNew_Var_Lab.setText("Insert Variable")
+        self.DTNew_Var_Lab.move(5, 426)
         newfont = QFont("Times", 8, QFont.Bold)
-        self.DTNew_Lab_Var.setFont(newfont)
-        self.DTNew_Lab_Var.show()
+        self.DTNew_Var_Lab.setFont(newfont)
+        self.DTNew_Var_Lab.show()
 
-        self.DTNew_Text_Section = QComboBox(self.DetTab3)
-        self.DTNew_Text_Section.move(3,406)
-        self.DTNew_Text_Section.show()
+        self.DTNew_Var_Comb = QComboBox(self.DetTab3)
+        self.DTNew_Var_Comb.move(3,446)
+        self.DTNew_Var_Comb.resize(100,30)
+        self.DTNew_Var_Comb.currentTextChanged.connect(self.VarChange)
+        self.DTNew_Var_Comb.show()
 
-    #Test function for tab change detection - temporary function
+        self.DTNew_Var_Lab2 = QLabel(self.DetTab3)
+        self.DTNew_Var_Lab2.setText("Default Value")
+        self.DTNew_Var_Lab2.move(130, 426)
+        newfont = QFont("Times", 8, QFont.Bold)
+        self.DTNew_Var_Lab2.setFont(newfont)
+        self.DTNew_Var_Lab2.show()
+
+        self.DTNew_Var_Comb2 = QComboBox(self.DetTab3)
+        self.DTNew_Var_Comb2.move(130,446)
+        self.DTNew_Var_Comb2.resize(100,30)
+        self.DTNew_Var_Comb2.show()
+
+        self.DTNew_VarIns_But = QPushButton(self.DetTab3)
+        self.DTNew_VarIns_But.setText("Insert")
+        self.DTNew_VarIns_But.move(257,446)
+        self.DTNew_VarIns_But.resize(100,30)
+        self.DTNew_VarIns_But.clicked.connect(self.InsVar)
+        self.DTNew_VarIns_But.show()
+
+        self.DTNew_AddSec_Button = QPushButton(self.DetTab3)
+        self.DTNew_AddSec_Button.move(3,486)
+        self.DTNew_AddSec_Button.resize(300,30)
+        self.DTNew_AddSec_Button.setText("Add Section")
+        self.DTNew_AddSec_Button.show()
+
+    #Read Variable List when New Protocol tab is opened
     def TabChange(self, i):
         if i == 2:
             print("yes")
+            conn = sqlite3.connect("./Variables/Variables.sqlite3")
+            tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            templist = []
+            for name in tables:
+                templist.append(name[0])
+            self.DTNew_Var_Comb.addItems(templist)
+
+            conn.close()
+
 
     #Open file when experiment is clicked in list - temporary function
     def openExp(self,clickedIndex):
@@ -280,8 +349,8 @@ class Atlas(QMainWindow):
 
     #Open dialog box and select a folder
     def showDialogDir(self):
-        fname = str(QFileDialog.getExistingDirectory(self, 'Select Directory'))
-        print(fname)
+        dname = str(QFileDialog.getExistingDirectory(self, 'Select Directory'))
+        self.DTNew_CatText_Title.setText(dname)
 
     #Search Experiments folder and build list of Experiments present on computer
     def GenExpList(self):
@@ -316,6 +385,27 @@ class Atlas(QMainWindow):
     def OpenCal(self):
         print("hello")
         self.DTNew_Cal.show()
+
+    def AddSection(self):
+        print("hello")
+
+    #When the Variable Category ComboBox is changed, update the second combobox
+    def VarChange(self, s):
+        self.DTNew_Var_Comb2.clear()
+        print(s)
+        var = s
+        conn = sqlite3.connect("./Variables/Variables.sqlite3")
+        rows = conn.execute("SELECT name FROM {0};".format(var))
+        templist = []
+        for name in rows:
+            templist.append(name[0])
+        self.DTNew_Var_Comb2.addItems(templist)
+        conn.close()
+
+    def InsVar(self):
+        print(self.DTNew_Var_Comb.currentText(),self.DTNew_Var_Comb2.currentText())
+        
+
 
 # Is this file being run directly?
 if __name__ == '__main__':
